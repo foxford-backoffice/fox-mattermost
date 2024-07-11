@@ -4912,7 +4912,7 @@ export class ClientError extends Error implements ServerError {
     status_code?: number;
 
     constructor(baseUrl: string, data: ServerError, cause?: any) {
-        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url || ''), {
+        super(data.message + ': ' + cleanUrlForLogging(baseUrl, data.url || '') + {
             cause,
         });
 
