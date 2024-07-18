@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import React from 'react';
 import type { Audit } from './audits';
 import type { Compliance } from './compliance';
 import type { AdminConfig, ClientLicense, EnvironmentConfig } from './config';
@@ -114,23 +113,11 @@ export type AnalyticsRow = {
   value: number;
 };
 
-export type IndexedPluginAnalyticsRow = {
-  [key: string]: PluginAnalyticsRow;
-};
-
 export enum AnalyticsVisualizationType {
   Count = 'count',
   LineChart = 'line_chart',
   DoughnutChart = 'doughnut_chart',
 }
-
-export type PluginAnalyticsRow = {
-  id: string;
-  name: React.ReactNode;
-  icon?: string;
-  value: any;
-  visualizationType?: AnalyticsVisualizationType;
-};
 
 export type SchemaMigration = {
   version: number;
