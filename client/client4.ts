@@ -4765,7 +4765,7 @@ export default class Client4 {
 
       const { status, headers, data } = res;
 
-      //const headers = ;
+      //const headers = parseAndMergeNestedHeaders(headers);
 
       if (headers[HEADER_X_VERSION_ID] && !headers['Cache-Control']) {
         const serverVersion = headers[HEADER_X_VERSION_ID];
