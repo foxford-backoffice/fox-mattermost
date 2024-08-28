@@ -1,6 +1,6 @@
 {
   "name": "fox-mattermost",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "main": "build/index.js",
   "description": "\"Foxford mattermost client and types\"",
   "scripts": {
@@ -21,10 +21,11 @@
     "build"
   ],
   "dependencies": {
-    "axios": "^1.7.2",
+    "axios": "^1.7.5",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",
     "eslint-plugin-prettier": "^5.0.0",
+    "form-data": "^4.0.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
     "winston": "^3.13.1",

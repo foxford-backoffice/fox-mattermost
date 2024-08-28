@@ -4781,8 +4781,8 @@ export default class Client4 {
         }
       }
 
-      if (this.logToConsole && data && 'msg' in data) {
-        console.error(data.message ?? ''); // eslint-disable-line no-console
+      if (this.logToConsole && data && 'message' in data) {
+        console.error(data.message); // eslint-disable-line no-console
       }
 
       return {
@@ -4791,7 +4791,6 @@ export default class Client4 {
         data,
       };
     } catch (err) {
-      console.error(err);
       throw new ClientError(this.getUrl(), err as Error);
     }
   };
