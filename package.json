@@ -1,6 +1,6 @@
 {
   "name": "fox-mattermost",
-  "version": "1.0.8",
+  "version": "1.1.0",
   "main": "build/index.js",
   "description": "\"Foxford mattermost client and types\"",
   "scripts": {
@@ -17,6 +17,9 @@
     "url": "https://github.com/foxford-backoffice/fox-mattermost/issues"
   },
   "homepage": "https://github.com/foxford-backoffice/fox-mattermost#readme",
+  "files": [
+    "build"
+  ],
   "dependencies": {
     "axios": "^1.7.2",
     "eslint": "^8.42.0",
