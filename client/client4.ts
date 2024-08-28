@@ -3,7 +3,7 @@
 
 /* eslint-disable max-lines */
 
-import axios, { AxiosRequestConfig, type AxiosHeaders } from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import FormData from 'form-data';
 import type {
   ClusterInfo,
@@ -828,7 +828,7 @@ export default class Client4 {
         { method: 'post', body: JSON.stringify(body) },
       );
 
-    if (headers.has('Token')) {
+    if ('Token' in headers) {
       this.setToken(headers.Token);
     }
 
@@ -871,7 +871,7 @@ export default class Client4 {
     );
 
     // eslint-disable-next-line no-constant-binary-expression
-    if (response && response.status === (200 || 201)) {
+    if (response && (response.status === 200 || response.status === 201)) {
       this.token = '';
     }
 
@@ -4765,7 +4765,7 @@ export default class Client4 {
 
       const { status, headers, data } = res;
 
-      //const headers = parseAndMergeNestedHeaders(headers);
+      //const headers = ;
 
       if (headers[HEADER_X_VERSION_ID] && !headers['Cache-Control']) {
         const serverVersion = headers[HEADER_X_VERSION_ID];
@@ -4786,11 +4786,12 @@ export default class Client4 {
       }
 
       return {
-        headers: headers as AxiosHeaders,
+        headers,
         status,
         data,
       };
     } catch (err) {
+      console.error(err);
       throw new ClientError(this.getUrl(), err as Error);
     }
   };

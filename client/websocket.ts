@@ -77,7 +77,7 @@ export default class WebSocketClient {
     this.responseCallbacks = {};
     this.connectionId = '';
     this.postedAck = false;
-    this.logger = logger
+    this.logger = logger;
   }
 
   // on connect, only send auth cookie and blank state.

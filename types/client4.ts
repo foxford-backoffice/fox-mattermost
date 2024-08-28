@@ -1,4 +1,4 @@
-import { AxiosHeaders, GenericAbortSignal } from 'axios';
+import { AxiosResponse, GenericAbortSignal } from 'axios';
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
@@ -12,7 +12,7 @@ export enum LogLevel {
 export type ClientResponse<T> = {
   response?: Response;
   status: number;
-  headers: AxiosHeaders;
+  headers: AxiosResponse['headers'];
   data: T;
 };
 
