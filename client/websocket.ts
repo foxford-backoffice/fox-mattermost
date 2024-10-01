@@ -1,7 +1,6 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import { Logger } from 'winston';
 import WebSocket from 'ws';
 
 const MAX_WEBSOCKET_FAILS = 7;
@@ -19,7 +18,6 @@ export type ErrorListener = (event: Event) => void;
 export type CloseListener = (connectFailCount: number) => void;
 
 export default class WebSocketClient {
-  private logger: Logger;
   private conn: WebSocket | null;
   private connectionUrl: string | null;
 
@@ -68,7 +66,7 @@ export default class WebSocketClient {
   private connectionId: string | null;
   private postedAck: boolean;
 
-  constructor(logger: Logger) {
+  constructor() {
     this.conn = null;
     this.connectionUrl = null;
     this.responseSequence = 1;
@@ -77,7 +75,6 @@ export default class WebSocketClient {
     this.responseCallbacks = {};
     this.connectionId = '';
     this.postedAck = false;
-    this.logger = logger;
   }
 
   // on connect, only send auth cookie and blank state.
@@ -93,12 +90,12 @@ export default class WebSocketClient {
     }
 
     if (connectionUrl == null) {
-      this.logger.info('websocket must have connection url'); //eslint-disable-line no-console
+      console.info('websocket must have connection url'); //eslint-disable-line no-console
       return;
     }
 
     if (this.connectFailCount === 0) {
-      this.logger.info('websocket connecting to ' + connectionUrl); //eslint-disable-line no-console
+      console.info('websocket connecting to ' + connectionUrl); //eslint-disable-line no-console
     }
 
     if (typeof postedAck != 'undefined') {
@@ -119,7 +116,7 @@ export default class WebSocketClient {
       }
 
       if (this.connectFailCount > 0) {
-        this.logger.info('websocket re-established connection'); //eslint-disable-line no-console
+        console.info('websocket re-established connection'); //eslint-disable-line no-console
 
         this.reconnectCallback?.();
         this.reconnectListeners.forEach((listener) => listener());
@@ -139,7 +136,7 @@ export default class WebSocketClient {
       this.responseSequence = 1;
 
       if (this.connectFailCount === 0) {
-        this.logger.info('websocket closed'); //eslint-disable-line no-console
+        console.info('websocket closed'); //eslint-disable-line no-console
       }
 
       this.connectFailCount++;
@@ -179,7 +176,7 @@ export default class WebSocketClient {
         // We ignore sequence number validation of message responses
         // and only focus on the purely server side event stream.
         if (msg.error) {
-          this.logger.info(msg); //eslint-disable-line no-console
+          console.info(msg); //eslint-disable-line no-console
         }
 
         if (this.responseCallbacks[msg.seq_reply]) {
@@ -192,7 +189,7 @@ export default class WebSocketClient {
           msg.event === WEBSOCKET_HELLO &&
           (this.missedEventCallback || this.missedMessageListeners.size > 0)
         ) {
-          this.logger.info('got connection id ', msg.data.connection_id); //eslint-disable-line no-console
+          console.info('got connection id ', msg.data.connection_id); //eslint-disable-line no-console
           // If we already have a connectionId present, and server sends a different one,
           // that means it's either a long timeout, or server restart, or sequence number is not found.
           // Then we do the sync calls, and reset sequence number to 0.
@@ -200,7 +197,7 @@ export default class WebSocketClient {
             this.connectionId !== '' &&
             this.connectionId !== msg.data.connection_id
           ) {
-            this.logger.info(
+            console.info(
               'long timeout, or server restart, or sequence number is not found.',
             ); //eslint-disable-line no-console
 
@@ -210,7 +207,7 @@ export default class WebSocketClient {
               try {
                 listener();
               } catch (e) {
-                this.logger.info(
+                console.info(
                   `missed message listener "${listener.name}" failed: ${e}`,
                 ); // eslint-disable-line no-console
               }
@@ -227,7 +224,7 @@ export default class WebSocketClient {
         // Now we check for sequence number, and if it does not match,
         // we just disconnect and reconnect.
         if (msg.seq !== this.serverSequence) {
-          this.logger.info(
+          console.info(
             'missed websocket event, act_seq=' +
               msg.seq +
               ' exp_seq=' +
@@ -259,7 +256,7 @@ export default class WebSocketClient {
 
     if (this.messageListeners.size > 5) {
       // eslint-disable-next-line no-console
-      this.logger.warn(
+      console.warn(
         `WebSocketClient has ${this.messageListeners.size} message listeners registered`,
       );
     }
@@ -281,7 +278,7 @@ export default class WebSocketClient {
 
     if (this.firstConnectListeners.size > 5) {
       // eslint-disable-next-line no-console
-      this.logger.warn(
+      console.warn(
         `WebSocketClient has ${this.firstConnectListeners.size} first connect listeners registered`,
       );
     }
@@ -303,7 +300,7 @@ export default class WebSocketClient {
 
     if (this.reconnectListeners.size > 5) {
       // eslint-disable-next-line no-console
-      this.logger.warn(
+      console.warn(
         `WebSocketClient has ${this.reconnectListeners.size} reconnect listeners registered`,
       );
     }
@@ -325,7 +322,7 @@ export default class WebSocketClient {
 
     if (this.missedMessageListeners.size > 5) {
       // eslint-disable-next-line no-console
-      this.logger.warn(
+      console.warn(
         `WebSocketClient has ${this.missedMessageListeners.size} missed message listeners registered`,
       );
     }
@@ -347,7 +344,7 @@ export default class WebSocketClient {
 
     if (this.closeListeners.size > 5) {
       // eslint-disable-next-line no-console
-      this.logger.warn(
+      console.warn(
         `WebSocketClient has ${this.closeListeners.size} close listeners registered`,
       );
     }
@@ -364,7 +361,7 @@ export default class WebSocketClient {
       this.conn.onclose = () => {};
       this.conn.close();
       this.conn = null;
-      this.logger.info('websocket closed'); //eslint-disable-line no-console
+      console.info('websocket closed'); //eslint-disable-line no-console
     }
   }
 

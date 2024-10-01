@@ -1,6 +1,6 @@
 {
   "name": "fox-mattermost",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "main": "build/index.js",
   "description": "\"Foxford mattermost client and types\"",
   "scripts": {
@@ -28,7 +28,6 @@
     "form-data": "^4.0.0",
     "prettier": "^3.0.0",
     "source-map-support": "^0.5.21",
-    "winston": "^3.13.1",
     "ws": "^8.18.0"
   },
   "devDependencies": {
