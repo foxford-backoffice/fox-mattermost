@@ -67,9 +67,9 @@ export default class WebSocketClient {
   private connectionId: string | null;
   private postedAck: boolean;
 
-  private nestLogger?: Logger
+  private nestLogger?: typeof Logger
 
-  constructor(logger?: Logger) {
+  constructor(logger?: typeof Logger) {
     this.conn = null;
     this.connectionUrl = null;
     this.responseSequence = 1;
