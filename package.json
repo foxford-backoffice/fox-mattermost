@@ -1,6 +1,6 @@
 {
   "name": "fox-mattermost",
-  "version": "1.1.2",
+  "version": "1.2.2",
   "main": "build/index.js",
   "description": "\"Foxford mattermost client and types\"",
   "scripts": {
@@ -21,6 +21,7 @@
     "build"
   ],
   "dependencies": {
+    "@nestjs/common": "^10.4.4",
     "axios": "^1.7.5",
     "eslint": "^8.42.0",
     "eslint-config-prettier": "^9.0.0",

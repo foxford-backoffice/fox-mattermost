@@ -40,3 +40,9 @@ export type FetchPaginatedThreadOptions = {
   fromCreateAt?: number;
   fromPost?: string;
 };
+
+export type FileUploadData = {
+  file: any;
+  channel_id: string;
+  filename: string;
+}

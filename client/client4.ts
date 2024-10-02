@@ -45,6 +45,7 @@ import type {
   StatusOK,
   FetchPaginatedThreadOptions,
   ClientResponse,
+  FileUploadData,
 } from '../types/client4';
 import { LogLevel } from '../types/client4';
 import type {
@@ -2904,15 +2905,15 @@ export default class Client4 {
     return url;
   }
 
-  uploadFile = (fileFormData: any, isBookmark?: boolean) => {
+  uploadFile = (fileUploadData: FileUploadData, isBookmark?: boolean) => {
     this.trackEvent('api', 'api_files_upload');
     const request: any = {
       method: 'post',
-      body: fileFormData,
+      body: fileUploadData.file,
     };
 
     return this.doFetch<FileUploadResponse>(
-      `${this.getFilesRoute()}${buildQueryString({ bookmark: isBookmark })}`,
+      `${this.getFilesRoute()}${buildQueryString({ bookmark: isBookmark, channel_id: fileUploadData.channel_id, filename: fileUploadData.filename })}`,
       request,
     );
   };
@@ -4757,6 +4758,7 @@ export default class Client4 {
     url: string,
     options: Options,
   ): Promise<ClientResponse<ClientDataResponse>> => {
+    const axiosOptions = this.getOptions(options);
     try {
       const res = await axios<ClientDataResponse>(
         url,
