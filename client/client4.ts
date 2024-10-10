@@ -2905,6 +2905,14 @@ export default class Client4 {
     return url;
   }
 
+  getFileInfo(fileId: string) {
+    const url = `${this.getFileRoute(fileId)}/info`;
+
+    return this.doFetch<FileInfo>(url, {
+      method: 'get',
+    });
+  }
+
   uploadFile = (fileUploadData: FileUploadData, isBookmark?: boolean) => {
     this.trackEvent('api', 'api_files_upload');
     const request: any = {
@@ -4758,7 +4766,6 @@ export default class Client4 {
     url: string,
     options: Options,
   ): Promise<ClientResponse<ClientDataResponse>> => {
-    const axiosOptions = this.getOptions(options);
     try {
       const res = await axios<ClientDataResponse>(
         url,
