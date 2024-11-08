@@ -1,8 +1,8 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
-import { Logger } from '@nestjs/common';
 import WebSocket from 'ws';
+import { Logger } from './logger';
 
 const MAX_WEBSOCKET_FAILS = 7;
 const MIN_WEBSOCKET_RETRY_TIME = 3000; // 3 sec
@@ -67,7 +67,7 @@ export default class WebSocketClient {
   private connectionId: string | null;
   private postedAck: boolean;
 
-  private nestLogger?: typeof Logger
+  private nestLogger?: typeof Logger;
 
   constructor(logger?: typeof Logger) {
     this.conn = null;
@@ -79,7 +79,7 @@ export default class WebSocketClient {
     this.connectionId = '';
     this.postedAck = false;
 
-    this.nestLogger = logger
+    this.nestLogger = logger;
   }
 
   // on connect, only send auth cookie and blank state.
@@ -100,7 +100,9 @@ export default class WebSocketClient {
     }
 
     if (this.connectFailCount === 0) {
-      (this.nestLogger ?? console).log('websocket connecting to ' + connectionUrl); //eslint-disable-line no-console
+      (this.nestLogger ?? console).log(
+        'websocket connecting to ' + connectionUrl,
+      ); //eslint-disable-line no-console
     }
 
     if (typeof postedAck != 'undefined') {
@@ -194,7 +196,10 @@ export default class WebSocketClient {
           msg.event === WEBSOCKET_HELLO &&
           (this.missedEventCallback || this.missedMessageListeners.size > 0)
         ) {
-          (this.nestLogger ?? console).log('got connection id ', msg.data.connection_id); //eslint-disable-line no-console
+          (this.nestLogger ?? console).log(
+            'got connection id ',
+            msg.data.connection_id,
+          ); //eslint-disable-line no-console
           // If we already have a connectionId present, and server sends a different one,
           // that means it's either a long timeout, or server restart, or sequence number is not found.
           // Then we do the sync calls, and reset sequence number to 0.

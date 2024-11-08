@@ -1,6 +1,7 @@
 // Copyright (c) 2015-present Mattermost, Inc. All Rights Reserved.
 // See LICENSE.txt for license information.
 
+import { Dialog } from './dialog';
 import type { MessageAttachment } from './message_attachments';
 import type { IDMappedObjects } from './utilities';
 
@@ -121,51 +122,4 @@ export type IntegrationsState = {
     url: string;
     dialog: Dialog;
   };
-};
-
-type Dialog = {
-  callback_id?: string;
-  elements?: DialogElement[];
-  title: string;
-  introduction_text?: string;
-  icon_url?: string;
-  submit_label?: string;
-  notify_on_cancel?: boolean;
-  state?: string;
-};
-
-export type DialogSubmission = {
-  url?: string;
-  callback_id: string;
-  state: string;
-  user_id: string;
-  channel_id: string;
-  team_id: string;
-  submission: {
-    [x: string]: string;
-  };
-  cancelled: boolean;
-};
-
-export type DialogElement = {
-  display_name: string;
-  name: string;
-  type: string;
-  subtype: string;
-  default: string;
-  placeholder: string;
-  help_text: string;
-  optional: boolean;
-  min_length: number;
-  max_length: number;
-  data_source: string;
-  options: Array<{
-    text: string;
-    value: any;
-  }>;
-};
-
-export type SubmitDialogResponse = {
-  error?: string;
-  errors?: Record<string, string>;
 };

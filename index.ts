@@ -12,6 +12,7 @@ export * from './types/cloud';
 export * from './types/compliance';
 export * from './types/config';
 export * from './types/data_retention';
+export * from './types/dialog';
 export * from './types/drafts';
 export * from './types/emojis';
 export * from './types/errors';

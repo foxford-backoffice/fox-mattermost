@@ -3,7 +3,7 @@
 
 /* eslint-disable max-lines */
 
-import axios, { AxiosRequestConfig } from 'axios';
+import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 import FormData from 'form-data';
 import type {
   ClusterInfo,
@@ -105,11 +105,9 @@ import type {
   Command,
   CommandArgs,
   CommandResponse,
-  DialogSubmission,
   IncomingWebhook,
   OAuthApp,
   OutgoingWebhook,
-  SubmitDialogResponse,
 } from '../types/integrations';
 import type { Job, JobTypeBase } from '../types/jobs';
 import type { MarketplaceApp, MarketplacePlugin } from '../types/marketplace';
@@ -174,6 +172,11 @@ import type { DeepPartial, RelationOneToOne } from '../types/utilities';
 import { cleanUrlForLogging } from './errors';
 import { buildQueryString } from './helpers';
 import type { TelemetryHandler } from './telemetry';
+import {
+  DialogSubmission,
+  OpenDialogParams,
+  SubmitDialogResponse,
+} from '../types/dialog';
 
 const HEADER_AUTH = 'Authorization';
 const HEADER_BEARER = 'BEARER';
@@ -2451,6 +2454,22 @@ export default class Client4 {
     });
   };
 
+  createEphemeralPost = async (user_id: string, post: Post) => {
+    const request = {
+      method: 'post',
+      body: JSON.stringify({ user_id, post }),
+    };
+
+    this.trackEvent('api', 'api_posts_ephemeral', {
+      user_id,
+    });
+
+    return await this.doFetch<Post>(
+      `${this.getPostsRoute()}/ephemeral`,
+      request,
+    );
+  };
+
   deletePost = (postId: string) => {
     this.trackEvent('api', 'api_posts_delete');
 
@@ -2913,17 +2932,26 @@ export default class Client4 {
     });
   }
 
-  uploadFile = (fileUploadData: FileUploadData, isBookmark?: boolean) => {
+  uploadFile = ({ file, channel_id, filename }: FileUploadData) => {
     this.trackEvent('api', 'api_files_upload');
-    const request: any = {
+
+    const body = new FormData();
+
+    body.append('files', file, { filename });
+    body.append('channel_id', channel_id);
+    body.append('client_ids', filename);
+
+    const request: Options = {
+      body,
       method: 'post',
-      body: fileUploadData.file,
+      headers: {
+        'Content-Type': 'multipart/form-data',
+        Accept: 'application/json',
+        ...body.getHeaders(),
+      },
     };
 
-    return this.doFetch<FileUploadResponse>(
-      `${this.getFilesRoute()}${buildQueryString({ bookmark: isBookmark, channel_id: fileUploadData.channel_id, filename: fileUploadData.filename })}`,
-      request,
-    );
+    return this.doFetch<FileUploadResponse>(this.getFilesRoute(), request);
   };
 
   getFilePublicLink = (fileId: string) => {
@@ -3016,10 +3044,10 @@ export default class Client4 {
     const url = `${this.getBaseRoute()}/logs`;
 
     if (!this.enableLogging) {
-      throw new ClientError(this.getUrl(), {
-        message: 'Logging disabled.',
-        url,
-      });
+      throw new ClientError(
+        this.getUrl(),
+        new AxiosError('Logging disabled.', '500', undefined, { url }),
+      );
     }
 
     return this.doFetch<{
@@ -3356,6 +3384,25 @@ export default class Client4 {
       `${this.getOutgoingOAuthConnectionRoute(connectionId)}`,
       { method: 'delete' },
     );
+  };
+
+  /** Открытие диалога */
+  openInteractiveDialog = async ({
+    trigger_id,
+    url,
+    dialog,
+  }: OpenDialogParams) => {
+    const { data } = await axios.post(
+      `${this.getUrl()}/api/v4/actions/dialogs/open`,
+      { trigger_id, url, dialog },
+      {
+        headers: {
+          Authorization: 'Bearer ' + this.token,
+        },
+      },
+    );
+
+    return data;
   };
 
   submitInteractiveDialog = (data: DialogSubmission) => {
@@ -4800,7 +4847,18 @@ export default class Client4 {
         data,
       };
     } catch (err) {
-      throw new ClientError(this.getUrl(), err as Error);
+      const axiosErr = err as AxiosError;
+      const { response } = axiosErr;
+
+      if (
+        response?.data &&
+        typeof response.data === 'object' &&
+        'message' in response.data
+      ) {
+        axiosErr.message += `: ${response.data.message}`;
+      }
+
+      throw new ClientError(this.getUrl(), axiosErr, err);
     }
   };
 
@@ -4913,21 +4971,23 @@ export class ClientError extends Error implements ServerError {
   url?: string;
   server_error_id?: string;
   status_code?: number;
+  message: string;
 
-  constructor(baseUrl: string, data: ServerError, cause?: any) {
+  constructor(baseUrl: string, err: AxiosError, cause?: any) {
     super(
-      data.message +
+      err.message +
         ': ' +
-        cleanUrlForLogging(baseUrl, data.url || '') +
+        cleanUrlForLogging(baseUrl, err.request.url || '') +
         {
           cause,
         },
     );
 
-    this.message = data.message;
-    this.url = data.url;
-    this.server_error_id = data.server_error_id;
-    this.status_code = data.status_code;
+    this.message = err.message;
+    this.url = err.request.url;
+    this.server_error_id = err.request.server_error_id;
+    this.status_code = err.status;
+    this.stack = err.stack;
 
     // Ensure message is treated as a property of this class when object spreading. Without this,
     // copying the object by using `{...error}` would not include the message.
